@@ -1,6 +1,6 @@
 name: ClassicPress Directory Coding Standard checks.
 
-on: [pull_request, push]
+on: [pull_request, push, workflow_dispatch]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,17 +11,17 @@ jobs:
       name: CPCS
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@v7
         - name: CPCS get rules
           run: |
             wget -O phpcs.xml https://raw.githubusercontent.com/ClassicPress/ClassicPress-Coding-Standards/main/phpcs.xml
             sed -i '/^\t<!-- start config -->.*/a\
               <file>.</file>
               ' phpcs.xml
-            sed -i '/MY_DOMAIN/ s//codepotent-update-manager/' phpcs.xml
+            sed -i '/MY_DOMAIN/ s//software-directory/' phpcs.xml
             mv phpcs.xml phpcs.xml.dist
         - name: CPCS checks
-          uses: 10up/wpcs-action@stable
+          uses: 10up/wpcs-action@v1.7.0
           with:
             use_local_config: 'true'
             enable_warnings: 'true'
