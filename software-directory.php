@@ -119,7 +119,7 @@ class SoftwareDirectory {
 		$post = get_queried_object();
 		$templates = [];
 		$assigned_template = get_page_template_slug($post);
-		if ($assigned_template && 0 === validate_file($assigned_template)) {
+		if ($assigned_template && validate_file($assigned_template) === 0) {
 			$templates[] = $assigned_template;
 		}
 		$slug = urldecode($post->post_name);

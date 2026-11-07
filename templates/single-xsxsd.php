@@ -25,7 +25,7 @@ $custom_fields = SoftwareDirectory::get_custom_fields();
 					<?php if ($terms && !is_wp_error($terms)) : ?>
 						<nav class="software-directory-kinds" aria-label="<?php esc_attr_e('Kinds', 'software-directory'); ?>">
 							<ul class="software-directory-terms">
-								<?php foreach ($terms as $term) : ?>
+								<?php foreach ($terms as $term) :  //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited ?>
 									<?php
 									$term_link = get_term_link($term);
 									if (is_wp_error($term_link)) {

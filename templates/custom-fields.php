@@ -13,11 +13,11 @@ if (!defined('ABSPATH')) {
 			continue;
 		}
 		$value = get_post_meta(get_the_ID(), $key, true);
-		if (!is_scalar($value) || '' === (string) $value) {
+		if (!is_scalar($value) || (string) $value === '') {
 			continue;
 		}
-		$is_url = isset($field['escape']) && 'esc_url' === $field['escape'];
-		if ($is_url && '' === esc_url($value)) {
+		$is_url = isset($field['escape']) && $field['escape'] === 'esc_url';
+		if ($is_url && esc_url($value) === '') {
 			continue;
 		}
 		?>
