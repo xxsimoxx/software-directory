@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 }
 
 get_header();
-$term = get_queried_object();
+$term = get_queried_object(); //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $custom_fields = SoftwareDirectory::get_custom_fields();
 ?>
 <main class="software-directory-archive">
