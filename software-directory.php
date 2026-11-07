@@ -30,6 +30,8 @@ class SoftwareDirectory {
 		add_action('init', [$this, 'register_taxonomy']);
 		add_action('add_meta_boxes', [$this, 'register_meta_box_primary']);
 		add_action('save_post', [$this, 'update_meta_box_primary'], 10, 2);
+		add_filter('template_include', [$this, 'get_taxonomy_template']);
+		add_filter('single_template', [$this, 'get_single_template']);
 	}
 
 
@@ -51,11 +53,11 @@ class SoftwareDirectory {
 		];
 
 		$args = [
-			'public'        => false,
+			'public'        => true,
 			'show_ui'       => true,
 			'show_in_menu'  => true,
 			'rewrite'       => false,
-			'supports'      => ['title', 'editor', 'author', 'custom-fields'],
+			'supports'      => ['title', 'editor', 'author', 'custom-fields', 'excerpt'],
 			'labels'        => $labels,
 		];
 
@@ -90,6 +92,46 @@ class SoftwareDirectory {
 
 	}
 
+	public function get_taxonomy_template($template) {
+		if (!is_tax(self::SLUG.'-kind')) {
+			return $template;
+		}
+
+		$term = get_queried_object();
+		$templates = [];
+		$slug = urldecode($term->slug);
+		if ($slug !== $term->slug) {
+			$templates[] = 'taxonomy-'.self::SLUG.'-kind-'.$slug.'.php';
+		}
+		$templates[] = 'taxonomy-'.self::SLUG.'-kind-'.$term->slug.'.php';
+		$templates[] = 'taxonomy-'.self::SLUG.'-kind.php';
+		$templates[] = 'taxonomy.php';
+		$theme_template = locate_template($templates);
+
+		return $theme_template ?: __DIR__.'/templates/taxonomy-'.self::SLUG.'-kind.php';
+	}
+
+	public function get_single_template($template) {
+		if (!is_singular(self::SLUG)) {
+			return $template;
+		}
+
+		$post = get_queried_object();
+		$templates = [];
+		$assigned_template = get_page_template_slug($post);
+		if ($assigned_template && 0 === validate_file($assigned_template)) {
+			$templates[] = $assigned_template;
+		}
+		$slug = urldecode($post->post_name);
+		if ($slug !== $post->post_name) {
+			$templates[] = 'single-'.self::SLUG.'-'.$slug.'.php';
+		}
+		$templates[] = 'single-'.self::SLUG.'-'.$post->post_name.'.php';
+		$templates[] = 'single-'.self::SLUG.'.php';
+
+		return locate_template($templates) ?: __DIR__.'/templates/single-'.self::SLUG.'.php';
+	}
+
 	public function register_meta_box_primary() {
 		add_meta_box(
 			self::SLUG.'-primary-editor',
@@ -101,11 +143,11 @@ class SoftwareDirectory {
 			);
 	}
 
-	public function get_custom_fields() {
+	public static function get_custom_fields() {
 		$custom_fields = [
 			'slug'     => [
 				'name'     => __('slug', 'software-directory'),
-				'display'  => true,
+				'display'  => false,
 				'render'   => 'render_mb_text',
 				'sanitize' => 'sanitize_key',
 				'escape'   => 'esc_attr',
