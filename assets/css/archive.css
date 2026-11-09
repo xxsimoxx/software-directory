@@ -140,6 +140,66 @@
 	margin-block-start: 2rem;
 }
 
+.software-directory-archive .software-directory-pagination .navigation {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.software-directory-archive .software-directory-pagination .nav-links {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+}
+
+.software-directory-archive .software-directory-pagination .page-numbers {
+	box-sizing: border-box;
+	display: inline-flex;
+	float: none;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.75rem;
+	min-height: 2.75rem;
+	max-width: 100%;
+	margin: 0;
+	padding: 0.625rem 0.875rem;
+	border: 1px solid currentColor;
+	border-radius: 0.25rem;
+	background: transparent;
+	box-shadow: none;
+	color: inherit;
+	font: inherit;
+	line-height: 1.4;
+	text-align: center;
+	text-decoration: none;
+}
+
+.software-directory-archive .software-directory-pagination .page-numbers.current {
+	background: color-mix(in srgb, currentColor 12%, transparent);
+	box-shadow: inset 0 0 0 1px currentColor;
+	font-weight: 700;
+}
+
+.software-directory-archive .software-directory-pagination a.page-numbers:hover {
+	background: color-mix(in srgb, currentColor 8%, transparent);
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+.software-directory-archive .software-directory-pagination a.page-numbers:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 0.2rem;
+}
+
+.software-directory-archive .software-directory-pagination .page-numbers.dots {
+	min-width: 0;
+	padding-inline: 0.25rem;
+	border-color: transparent;
+}
+
 @media (min-width: 40rem) {
 	:where(.software-directory-archive) .software-directory-items {
 		grid-template-columns: repeat(2, minmax(0, 26rem));
