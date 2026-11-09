@@ -173,10 +173,10 @@ Archive cards use one, two, or three columns according to viewport width. Single
 
 Add scoped overrides in a child theme stylesheet. Asset loading depends on the queried archive or post type, so it also applies when the theme supplies a template override.
 
-`xxsimoxx\SoftwareDirectory\SoftwareDirectory::get_custom_fields()` exposes field definitions through the filter **`xsxsd-datails`**. This spelling is the implemented hook name. Definitions include `name`, `display`, `render`, `sanitize`, and `escape`. For example, to display the existing slug field:
+`xxsimoxx\SoftwareDirectory\SoftwareDirectory::get_custom_fields()` exposes field definitions through the filter **`xsxsd-details`**. This spelling is the implemented hook name. Definitions include `name`, `display`, `render`, `sanitize`, and `escape`. For example, to display the existing slug field:
 
 ```php
-add_filter('xsxsd-datails', function ($fields) {
+add_filter('xsxsd-details', function ($fields) {
     $fields['slug']['display'] = true;
     return $fields;
 });

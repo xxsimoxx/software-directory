@@ -311,7 +311,7 @@ class SoftwareDirectory {
 				'escape'   => 'esc_url',
 			],
 		];
-		$custom_fields = apply_filters(self::SLUG.'-datails', $custom_fields);
+		$custom_fields = apply_filters(self::SLUG.'-details', $custom_fields);
 		return $custom_fields;
 	}
 
