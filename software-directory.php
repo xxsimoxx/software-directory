@@ -32,6 +32,113 @@ class SoftwareDirectory {
 		add_action('save_post', [$this, 'update_meta_box_primary'], 10, 2);
 		add_filter('template_include', [$this, 'get_taxonomy_template']);
 		add_filter('single_template', [$this, 'get_single_template']);
+		add_action('init', [$this, 'register_download_endpoint']);
+		add_action('template_redirect', [$this, 'download_latest_release'], 0);
+	}
+
+	public function register_download_endpoint() {
+		add_rewrite_tag('%xsxsd_download%', '([^&]+)');
+		add_rewrite_rule(
+			'^software/([^/]+)/latest\.zip/?$',
+			'index.php?post_type='.self::SLUG.'&name=$matches[1]&xsxsd_download=1',
+			'top'
+		);
+	}
+
+	public function download_latest_release() {
+		if (get_query_var('xsxsd_download') !== '1') {
+			return;
+		}
+
+		nocache_headers();
+		$post = get_queried_object();
+		if (!($post instanceof \WP_Post) || $post->post_type !== self::SLUG || $post->post_status !== 'publish') {
+			wp_die(esc_html__('Software not found.', 'software-directory'), '', ['response' => 404]);
+		}
+
+		$repository_url = get_post_meta($post->ID, 'git-repo', true);
+		if (!is_string($repository_url) || !preg_match('~\Ahttps://github\.com/([a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?)/([a-z0-9_.-]{1,100})/?\z~i', $repository_url, $matches)) {
+			wp_die(esc_html__('Invalid GitHub repository.', 'software-directory'), '', ['response' => 404]);
+		}
+		$owner = $matches[1];
+		$repo = preg_replace('/\.git$/i', '', $matches[2]);
+		if ($repo === '' || $repo === '.' || $repo === '..') {
+			wp_die(esc_html__('Invalid GitHub repository.', 'software-directory'), '', ['response' => 404]);
+		}
+
+		$cache_key = self::SLUG.'_latest_zip_'.md5(strtolower($owner.'/'.$repo));
+		$result = get_transient($cache_key);
+		if ($result === false) {
+			$result = $this->get_latest_release_download($owner, $repo);
+			set_transient($cache_key, $result, 120 * MINUTE_IN_SECONDS);
+		}
+
+		if (!empty($result['url']) && $this->is_repository_download($result['url'], $owner, $repo)) {
+			// The destination is external, but restricted to this repository on github.com.
+			if (wp_redirect($result['url'], 302, 'Software Directory')) {
+				exit;
+			}
+		}
+		wp_die(esc_html__('No unambiguous ZIP download is available. Please try again later.', 'software-directory'), '', ['response' => $result['status'] ?? 502]);
+	}
+
+	private function is_repository_download($url, $owner, $repo) {
+		if (!is_string($url)) {
+			return false;
+		}
+		$pattern = '~\Ahttps://github\.com/'.preg_quote($owner, '~').'/'.preg_quote($repo, '~').'/releases/download/[^/?#]+/[^/?#]+\.zip\z~i';
+		if (preg_match($pattern, $url) !== 1 || filter_var($url, FILTER_VALIDATE_URL) === false) {
+			return false;
+		}
+		foreach (array_slice(explode('/', wp_parse_url($url, PHP_URL_PATH)), -2) as $segment) {
+			$segment = rawurldecode($segment);
+			if ($segment === '.' || $segment === '..' || preg_match('~[/\\\\\x00-\x20?#]~', $segment)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private function get_latest_release_download($owner, $repo) {
+		$response = wp_remote_get('https://api.github.com/repos/'.$owner.'/'.$repo.'/releases/latest', [
+			'timeout'     => 15,
+			'redirection' => 0,
+			'headers'     => ['Accept' => 'application/vnd.github+json'],
+		]);
+		if (is_wp_error($response)) {
+			return ['status' => 502];
+		}
+		$status = wp_remote_retrieve_response_code($response);
+		if ($status !== 200) {
+			return ['status' => $status === 404 ? 404 : 502];
+		}
+
+		$release = json_decode(wp_remote_retrieve_body($response), true);
+		if (!is_array($release) || !isset($release['assets']) || !is_array($release['assets']) || !empty($release['draft']) || !empty($release['prerelease'])) {
+			return ['status' => 502];
+		}
+
+		$zips = [];
+		$matching_zips = [];
+		foreach ($release['assets'] as $asset) {
+			if (!is_array($asset) || !isset($asset['name'], $asset['browser_download_url']) || !is_string($asset['name']) || !preg_match('/\.zip$/i', $asset['name'])) {
+				continue;
+			}
+			if (!$this->is_repository_download($asset['browser_download_url'], $owner, $repo)) {
+				return ['status' => 502];
+			}
+			$zips[] = $asset['browser_download_url'];
+			if (strcasecmp($asset['name'], $repo.'.zip') === 0) {
+				$matching_zips[] = $asset['browser_download_url'];
+			}
+		}
+		if (count($matching_zips) === 1) {
+			return ['url' => $matching_zips[0]];
+		}
+		if (count($zips) === 1) {
+			return ['url' => $zips[0]];
+		}
+		return ['status' => empty($zips) ? 404 : 409];
 	}
 
 
@@ -59,6 +166,10 @@ class SoftwareDirectory {
 			'rewrite'       => false,
 			'supports'      => ['title', 'editor', 'author', 'custom-fields', 'excerpt'],
 			'labels'        => $labels,
+			'rewrite'       => [
+				'slug'       => 'software',
+				'with_front' => false,
+			],
 		];
 
 		register_post_type(self::SLUG, $args);
@@ -83,6 +194,7 @@ class SoftwareDirectory {
 			'hierarchical'      => true,
 			'labels'            => $labels,
 			'show_ui'           => true,
+			'show_in_nav_menus' => true,
 			'show_admin_column' => true,
 			'query_var'         => true,
 			'rewrite'           => ['slug' => 'kind'],
