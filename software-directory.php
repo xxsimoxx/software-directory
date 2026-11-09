@@ -384,4 +384,5 @@ new SoftwareDirectory;
 if (defined('WP_CLI') && WP_CLI && class_exists('\WP_CLI')) {
 	require_once __DIR__.'/includes/class-software-directory-cli.php';
 	\WP_CLI::add_command('software-directory insert', [new SoftwareDirectoryCLI(), 'insert']);
+	\WP_CLI::add_command('software-directory update', [new SoftwareDirectoryCLI(), 'update']);
 }
