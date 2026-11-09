@@ -173,6 +173,20 @@ If the generated content is identical to the stored content, no update is perfor
 
 ## Customization
 
+### Archive pagination
+
+Kind archives display **12 software entries per page** by default, independently of the ClassicPress reading settings. The `software_directory_posts_per_page` filter receives the default integer `12` and accepts only positive PHP integers. Invalid values, including numeric strings, fall back to `12`.
+
+```php
+add_filter('software_directory_posts_per_page', function ($posts_per_page) {
+    return 24;
+});
+```
+
+The setting applies through `pre_get_posts` only to the frontend main query for `xsxsd-kind` archives. Administration queries, secondary queries, and feeds are unaffected. Native pagination and page-count calculation continue to use the main query.
+
+### Styles and custom fields
+
 Frontend classes use the `software-directory-` prefix. Common selectors include `.software-directory-archive`, `.software-directory-single`, `.software-directory-card`, `.software-directory-fields`, and `.software-directory-download`.
 
 | Stylesheet | Handle | Loaded on |

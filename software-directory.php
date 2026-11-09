@@ -44,6 +44,20 @@ class SoftwareDirectory {
 		add_action('template_redirect', [$this, 'download_latest_release'], 0);
 		add_action('wp_enqueue_scripts', [$this, 'enqueue_archive_styles']);
 		add_action('wp_enqueue_scripts', [$this, 'enqueue_single_styles']);
+		add_action('pre_get_posts', [$this, 'set_archive_posts_per_page']);
+	}
+
+	public function set_archive_posts_per_page($query) {
+		if (is_admin() || !$query->is_main_query() || !$query->is_tax(self::SLUG.'-kind') || $query->is_feed()) {
+			return;
+		}
+
+		$posts_per_page = apply_filters('software_directory_posts_per_page', 12);
+		if (!is_int($posts_per_page) || $posts_per_page <= 0) {
+			$posts_per_page = 12;
+		}
+		$query->set('posts_per_page', $posts_per_page);
+		$query->set('posts_per_archive_page', $posts_per_page);
 	}
 
 	public function enqueue_archive_styles() {
