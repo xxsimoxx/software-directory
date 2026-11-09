@@ -1,0 +1,137 @@
+.software-directory-single {
+	padding: 1.5rem;
+	overflow-wrap: anywhere;
+}
+
+:where(.software-directory-single) .software-directory-header {
+	margin-block-end: 1.5rem;
+}
+
+:where(.software-directory-single) .software-directory-title {
+	margin: 0;
+	font-size: clamp(1.75em, 3vw, 2.5em);
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+:where(.software-directory-single) .software-directory-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	align-items: start;
+	gap: 1.5rem;
+}
+
+:where(.software-directory-single) .software-directory-description,
+:where(.software-directory-single) .software-directory-metadata {
+	min-width: 0;
+}
+
+:where(.software-directory-single) .software-directory-image {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	height: auto;
+	margin: 0 0 1.25rem;
+	border: 0;
+	border-radius: 0;
+	outline: none;
+	box-shadow: none;
+	object-fit: contain;
+}
+
+:where(.software-directory-single) .software-directory-description img {
+	max-width: 100%;
+	height: auto;
+}
+
+:where(.software-directory-single) .software-directory-description pre {
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-wrap: normal;
+}
+
+:where(.software-directory-single) .software-directory-description :not(pre) > code {
+	overflow-wrap: anywhere;
+}
+
+:where(.software-directory-single) .software-directory-metadata {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1rem;
+	border: 1px solid currentColor;
+	border-radius: 0.5rem;
+	color: inherit;
+	background: inherit;
+}
+
+:where(.software-directory-single) .software-directory-download {
+	margin-block-start: 0;
+}
+
+:where(.software-directory-single) .software-directory-fields {
+	margin: 0;
+	font-size: 0.9em;
+	line-height: 1.5;
+}
+
+:where(.software-directory-single) .software-directory-field-name {
+	font-weight: 700;
+}
+
+:where(.software-directory-single) .software-directory-field-value {
+	margin: 0 0 0.625rem;
+}
+
+:where(.software-directory-single) .software-directory-field-value:last-child {
+	margin-block-end: 0;
+}
+
+:where(.software-directory-single) .software-directory-metadata > * + * {
+	padding-block-start: 1rem;
+	border-block-start: 1px solid currentColor;
+}
+
+:where(.software-directory-single) .software-directory-metadata-title {
+	margin: 0 0 0.625rem;
+	font-size: 1em;
+	font-weight: 700;
+}
+
+:where(.software-directory-single) .software-directory-terms {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+:where(.software-directory-single) .software-directory-term {
+	margin: 0;
+	padding: 0;
+}
+
+:where(.software-directory-single) .software-directory-field-value a,
+:where(.software-directory-single) .software-directory-term a {
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+:where(.software-directory-single) .software-directory-field-value a:hover,
+:where(.software-directory-single) .software-directory-term a:hover {
+	text-decoration-thickness: 0.12em;
+}
+
+:where(.software-directory-single) .software-directory-field-value a:focus-visible,
+:where(.software-directory-single) .software-directory-term a:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 0.2rem;
+}
+
+@media (min-width: 64rem) {
+	:where(.software-directory-single) .software-directory-has-sidebar {
+		grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	}
+}

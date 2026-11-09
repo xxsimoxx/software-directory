@@ -34,6 +34,45 @@ class SoftwareDirectory {
 		add_filter('single_template', [$this, 'get_single_template']);
 		add_action('init', [$this, 'register_download_endpoint']);
 		add_action('template_redirect', [$this, 'download_latest_release'], 0);
+		add_action('wp_enqueue_scripts', [$this, 'enqueue_archive_styles']);
+		add_action('wp_enqueue_scripts', [$this, 'enqueue_single_styles']);
+	}
+
+	public function enqueue_archive_styles() {
+		if (!is_tax(self::SLUG.'-kind')) {
+			return;
+		}
+
+		$this->enqueue_download_styles();
+		wp_enqueue_style(
+			'software-directory-archive',
+			plugins_url('assets/css/archive.css', __FILE__),
+			['software-directory-download'],
+			(string) filemtime(__DIR__.'/assets/css/archive.css')
+		);
+	}
+
+	public function enqueue_single_styles() {
+		if (!is_singular(self::SLUG)) {
+			return;
+		}
+
+		$this->enqueue_download_styles();
+		wp_enqueue_style(
+			'software-directory-single',
+			plugins_url('assets/css/single.css', __FILE__),
+			['software-directory-download'],
+			(string) filemtime(__DIR__.'/assets/css/single.css')
+		);
+	}
+
+	private function enqueue_download_styles() {
+		wp_enqueue_style(
+			'software-directory-download',
+			plugins_url('assets/css/download.css', __FILE__),
+			[],
+			(string) filemtime(__DIR__.'/assets/css/download.css')
+		);
 	}
 
 	public function register_download_endpoint() {
@@ -164,7 +203,7 @@ class SoftwareDirectory {
 			'show_ui'       => true,
 			'show_in_menu'  => true,
 			'rewrite'       => false,
-			'supports'      => ['title', 'editor', 'author', 'custom-fields', 'excerpt'],
+			'supports'      => ['title', 'editor', 'author', 'custom-fields', 'excerpt', 'thumbnail'],
 			'labels'        => $labels,
 			'rewrite'       => [
 				'slug'       => 'software',
@@ -341,3 +380,8 @@ class SoftwareDirectory {
 
 
 new SoftwareDirectory;
+
+if (defined('WP_CLI') && WP_CLI && class_exists('\WP_CLI')) {
+	require_once __DIR__.'/includes/class-software-directory-cli.php';
+	\WP_CLI::add_command('software-directory insert', [new SoftwareDirectoryCLI(), 'insert']);
+}

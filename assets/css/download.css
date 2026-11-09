@@ -1,0 +1,37 @@
+:where(.software-directory-archive, .software-directory-single) .software-directory-download {
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-height: 2.75rem;
+	margin-block-start: auto;
+	padding: 0.625rem 1rem;
+	border: 1px solid currentColor;
+	border-radius: 0.25rem;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-weight: 700;
+	line-height: 1.4;
+	text-decoration: none;
+}
+
+:where(.software-directory-archive, .software-directory-single) .software-directory-download:hover {
+	color: inherit;
+	outline: 1px solid currentColor;
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+:where(.software-directory-archive, .software-directory-single) .software-directory-download:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 0.2rem;
+}
+
+:where(.software-directory-archive, .software-directory-single) .software-directory-download-icon {
+	flex-shrink: 0;
+	width: 1.25em;
+	height: 1.25em;
+}
+
