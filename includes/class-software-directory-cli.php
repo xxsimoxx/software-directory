@@ -122,7 +122,7 @@ class SoftwareDirectoryCLI {
 		if (!is_array($readme) || ($readme['type'] ?? '') !== 'file' || ($readme['encoding'] ?? '') !== 'base64' || !isset($readme['content']) || !is_string($readme['content'])) {
 			\WP_CLI::error('README.md is missing or GitHub returned unsupported file content.');
 		}
-		$markdown = base64_decode($readme['content'], true);
+			$markdown = base64_decode($readme['content'], true); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- GitHub Contents API returns base64 file data; strict decoding does not execute it.
 		if ($markdown === false) {
 			\WP_CLI::error('GitHub returned invalid README.md data.');
 		}
@@ -152,7 +152,7 @@ class SoftwareDirectoryCLI {
 			'post_status'      => array_keys(get_post_stati()),
 			'posts_per_page'   => -1,
 			'fields'           => 'ids',
-			'meta_key'         => 'git-repo',
+				'meta_key'         => 'git-repo', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- CLI-only duplicate check needs repository metadata to compare normalized URLs across all statuses.
 			'suppress_filters' => true,
 		]);
 		update_meta_cache('post', $post_ids);

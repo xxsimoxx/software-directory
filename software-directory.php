@@ -114,11 +114,11 @@ class SoftwareDirectory {
 
 		if (!empty($result['url']) && $this->is_repository_download($result['url'], $owner, $repo)) {
 			// The destination is external, but restricted to this repository on github.com.
-			if (wp_redirect($result['url'], 302, 'Software Directory')) {
+				if (wp_redirect($result['url'], 302, 'Software Directory')) { // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- External GitHub URL validated against the expected repository above.
 				exit;
 			}
 		}
-		wp_die(esc_html__('No unambiguous ZIP download is available. Please try again later.', 'software-directory'), '', ['response' => $result['status'] ?? 502]);
+			wp_die(esc_html__('No unambiguous ZIP download is available. Please try again later.', 'software-directory'), '', ['response' => $result['status'] ?? 502]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Message is escaped; response is an internally generated HTTP status, not HTML output.
 	}
 
 	private function is_repository_download($url, $owner, $repo) {
