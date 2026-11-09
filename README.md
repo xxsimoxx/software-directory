@@ -53,6 +53,18 @@ The meta box save handler requires a valid nonce and the `update_plugins` capabi
 
 Use **Appearance → Menus** to add software entries and kind archives to an existing theme menu. The plugin does not create a menu or register a menu location.
 
+### Optional GitHub API token
+
+To authenticate GitHub REST API requests and use the available authenticated rate limits, define an optional token in `wp-config.php`, before ClassicPress is loaded:
+
+```php
+define('GITHUB_API_TOKEN', 'your-github-token');
+```
+
+Keep the token secure: do not commit it to version control or expose it in public files. A token is not required for ordinary plugin operation. Undefined, empty, non-string, or malformed token values leave requests unauthenticated.
+
+The same header preparation is used for release lookups, CLI repository validation, README retrieval, and the GitHub Markdown rendering fallback. A valid token is sent only as `Authorization: Bearer <token>` to the GitHub REST API; it is not added to URLs or asset redirects. Existing request headers and the native HTTP client's User-Agent are preserved. Token configuration does not invalidate cached release results or change the CLI's public-repository validation.
+
 ## Frontend templates
 
 The plugin provides:
@@ -109,7 +121,7 @@ Published software entries have a local endpoint:
 
 The endpoint reads `git-repo` and accepts HTTPS repository URLs on `github.com` with an owner and repository name. A trailing slash and a `.git` suffix are accepted. Additional path segments, credentials, query strings, and fragments are not accepted.
 
-On a cache miss, it calls `GET https://api.github.com/repos/{owner}/{repo}/releases/latest` without authentication. It uses uploaded release assets ending in `.zip`, not GitHub's automatically generated source archives. Drafts and prereleases are rejected.
+On a cache miss, it calls `GET https://api.github.com/repos/{owner}/{repo}/releases/latest`, using `GITHUB_API_TOKEN` when configured with a valid value, or without authentication otherwise. It uses uploaded release assets ending in `.zip`, not GitHub's automatically generated source archives. Drafts and prereleases are rejected.
 
 ZIP selection follows these rules:
 
@@ -186,7 +198,7 @@ The field editor, saving logic, and frontend partial consume these definitions; 
 
 ## Limitations
 
-- GitHub operations support public repositories only. There is no built-in token configuration or support for other Git hosts.
+- The plugin is intended for public GitHub repositories; CLI validation rejects private repositories even when a token is configured. Other Git hosts are not supported.
 - GitHub API rate limits and network availability can prevent downloads or README imports. API redirects are not followed; use the repository's current URL.
 - Download links require a suitable uploaded ZIP asset on the latest release. There is no fallback to source archives, tags, or prereleases.
 - CLI imports require the exact root filename `README.md` on the default branch and a base64 file response from the Contents API. Unsupported responses are rejected.

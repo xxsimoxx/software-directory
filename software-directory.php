@@ -25,6 +25,14 @@ class SoftwareDirectory {
 
 	const SLUG = 'xsxsd';
 
+	public static function get_github_api_headers($headers = []) {
+		$headers += ['Accept' => 'application/vnd.github+json'];
+		if (defined('GITHUB_API_TOKEN') && is_string(GITHUB_API_TOKEN) && preg_match('#\A[A-Za-z0-9._~+/-]+=*\z#', GITHUB_API_TOKEN) === 1) {
+			$headers['Authorization'] = 'Bearer '.GITHUB_API_TOKEN;
+		}
+		return $headers;
+	}
+
 	public function __construct() {
 		add_action('init', [$this, 'register_custom_post_type']);
 		add_action('init', [$this, 'register_taxonomy']);
@@ -142,7 +150,7 @@ class SoftwareDirectory {
 		$response = wp_remote_get('https://api.github.com/repos/'.$owner.'/'.$repo.'/releases/latest', [
 			'timeout'     => 15,
 			'redirection' => 0,
-			'headers'     => ['Accept' => 'application/vnd.github+json'],
+			'headers'     => self::get_github_api_headers(),
 		]);
 		if (is_wp_error($response)) {
 			return ['status' => 502];

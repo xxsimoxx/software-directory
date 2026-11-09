@@ -169,7 +169,7 @@ class SoftwareDirectoryCLI {
 		$args = [
 			'timeout'     => 30,
 			'redirection' => 0,
-			'headers'     => ['Accept' => 'application/vnd.github+json'],
+			'headers'     => SoftwareDirectory::get_github_api_headers(),
 		];
 		if ($markdown === null) {
 			$response = wp_remote_get('https://api.github.com'.$path, $args);
