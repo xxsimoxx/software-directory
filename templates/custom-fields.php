@@ -24,7 +24,7 @@ if (!defined('ABSPATH')) {
 		<dt class="software-directory-field-name"><?php echo esc_html($field['name'] ?? $key); ?></dt>
 		<dd class="software-directory-field-value">
 			<?php if ($is_url) : ?>
-				<a href="<?php echo esc_url($value); ?>"><?php echo esc_html(!empty($descriptive_field_links) && !empty($field['name']) ? $field['name'] : $value); ?></a>
+				<a href="<?php echo esc_url($value); ?>"><?php echo esc_html($value); ?></a>
 			<?php else : ?>
 				<?php echo esc_html($value); ?>
 			<?php endif; ?>
